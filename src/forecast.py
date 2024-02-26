@@ -1,32 +1,31 @@
-from datetime import datetime
 from collections import defaultdict
+
+from src.model import Entry
 
 
 def summarize_forecast(data):
-    grp_day = defaultdict(list)
+    group_day = defaultdict(list)
     summaries = {}
 
     # Group entries by day
-    for entry in data:
-        entry_time = datetime.fromisoformat(entry["date_time"].replace('Z', '+00:00'))
-        key = entry_time.date()
-        grp_day[key].append(entry)
+    for datum in data:
+        entry = Entry(data=datum)
+        group_day[entry.get_day()].append(entry)
 
     # Process each day
-    for day, entries in grp_day.items():
+    for day, entries in group_day.items():
         morning_temperature, morning_rain, afternoon_temperature, afternoon_rain = [], [], [], []
-        all_temperatures = [entry["average_temperature"] for entry in entries]
+        all_temperatures = [entry.average_temperature for entry in entries]
 
         for entry in entries:
-            entry_time = datetime.fromisoformat(entry["date_time"].replace('Z', '+00:00'))
             # collect morning period entries
-            if 6 <= entry_time.hour < 12:
-                morning_temperature.append(entry["average_temperature"])
-                morning_rain.append(entry["probability_of_rain"])
+            if 6 <= entry.date_time.hour < 12:
+                morning_temperature.append(entry.average_temperature)
+                morning_rain.append(entry.probability_of_rain)
             # collection afternoon period entries
-            elif 12 <= entry_time.hour < 18:
-                afternoon_temperature.append(entry["average_temperature"])
-                afternoon_rain.append(entry["probability_of_rain"])
+            elif 12 <= entry.date_time.hour < 18:
+                afternoon_temperature.append(entry.average_temperature)
+                afternoon_rain.append(entry.probability_of_rain)
 
         summary = {
             # if no morning data, report insufficient data
