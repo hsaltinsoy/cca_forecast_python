@@ -7,26 +7,26 @@ def summarize_forecast(data):
     summaries = {}
 
     # Group entries by day
-    for e in data:
-        entry_time = datetime.fromisoformat(e["date_time"].replace('Z', '+00:00'))
+    for entry in data:
+        entry_time = datetime.fromisoformat(entry["date_time"].replace('Z', '+00:00'))
         key = entry_time.date()
-        grp_day[key].append(e)
+        grp_day[key].append(entry)
 
     # Process each day
     for day, entries in grp_day.items():
         morning_t, morning_r, afternoon_t, afternoon_r = [], [], [], []
         all_t = [entry["average_temperature"] for entry in entries]
 
-        for e in entries:
-            entry_time = datetime.fromisoformat(e["date_time"].replace('Z', '+00:00'))
+        for entry in entries:
+            entry_time = datetime.fromisoformat(entry["date_time"].replace('Z', '+00:00'))
             # collect morning period entries
             if 6 <= entry_time.hour < 12:
-                morning_t.append(e["average_temperature"])
-                morning_r.append(e["probability_of_rain"])
+                morning_t.append(entry["average_temperature"])
+                morning_r.append(entry["probability_of_rain"])
             # collection afternoon period entries
             elif 12 <= entry_time.hour < 18:
-                afternoon_t.append(e["average_temperature"])
-                afternoon_r.append(e["probability_of_rain"])
+                afternoon_t.append(entry["average_temperature"])
+                afternoon_r.append(entry["probability_of_rain"])
 
         summary = {
             # if no morning data, report insufficient data
